@@ -5,6 +5,9 @@ https://github.com/Sp0Q1/action-smart-led-curtain-2wire
 
 A high-performance, zero-flicker **ESP32 firmware and studio web interface** designed to control commercial **20×20 (400-LED) 2-Wire Smart Curtain Lights** over Wi-Fi.
 
+**Curtain lights used on this project:**
+https://www.amazon.com/dp/B0DKS8FVS7?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1
+
 Unlike standard 3-wire addressable LEDs, these 2-wire fairy curtains send both power and data over only **two wires (`LED+` and `LED-`)** by modulating the ground return path. This firmware uses a dedicated dual-core architecture on the ESP32 to deliver **flicker-free 2D animations, custom palettes, 60 presets, playlists, animated 20×20 GIF playback, infrared remote support, and sunrise/sunset scheduling**.
 
 ---

@@ -128,12 +128,12 @@ Use a true **$3.3\text{V}$ Logic-Level N-Channel MOSFET** such as **`AO3400`** (
 
 ---
 
-## 🎞️ Using the External HTML GIF Connector (`wled_html_connector_22.html`)
+## 🎞️ Using the External HTML GIF Connector (`wled_html_connector.html`)
 
-For advanced GIF management, LaMetric store browsing, automatic resizing of any image/GIF to 20×20, and live **Pixel Paint**, open the included **`wled_html_connector_22.html`** file on your computer:
+For advanced GIF management, LaMetric store browsing, automatic resizing of any image/GIF to 20×20, and live **Pixel Paint**, open the included **`wled_html_connector_22.html`** file on your computer, make shure you also download the gifs.js file:
 
-1. Double-click **`wled_html_connector_22.html`** to open it in Chrome or Edge (keep `gifs.js` in the same folder).
-2. Enter your curtain controller's IP address in the **IP** box at the top and click **Reconnect**.
+1. Double-click **`wled_html_connector.html`** to open it in Chrome or Edge (keep `gifs.js` in the same folder).
+2. Enter your curtain controller's IP address in the **IP** box at the top and click **Reconnect** and select Non-Serpentine from the Wiring Layout dropdown.
 3. Use any of the studio tabs:
    * **🖼️ Big Explorer:** Load a local folder of 2,000+ GIFs with pagination and search.
    * **📑 GIF Playlist:** Queue multiple GIFs from your computer to cycle automatically.

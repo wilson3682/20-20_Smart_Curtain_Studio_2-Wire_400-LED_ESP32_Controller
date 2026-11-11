@@ -1,0 +1,2466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WLED Matrix Studio Pro (Ultimate Edition)</title>
+  <style>
+    :root {
+      --bg: #0c0c10;
+      --card: #181820;
+      --card-hover: #22222e;
+      --border: #2a2a38;
+      --accent: #6366f1;
+      --accent-hover: #4f46e5;
+      --success: #10b981;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --text: #f3f4f6;
+      --text-muted: #9ca3af;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 1.25rem 1rem;
+      min-height: 100vh;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+    }
+
+    h1 { font-size: 1.35rem; text-align: center; }
+    h2 { font-size: 0.8rem; margin-bottom: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .top-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-top: 0.75rem;
+    }
+
+    /* Tabs */
+    .tab-bar {
+      display: flex;
+      background: #131317;
+      padding: 4px;
+      border-radius: 8px;
+      gap: 4px;
+      border: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      flex: 1;
+      min-width: 125px;
+      padding: 0.65rem 0.5rem;
+      background: transparent;
+      color: var(--text-muted);
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-size: 0.82rem;
+      text-align: center;
+    }
+    .tab-btn.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .grid-settings {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.75rem;
+    }
+    label { font-size: 0.8rem; color: var(--text-muted); display: block; margin-bottom: 0.25rem; }
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 0.55rem;
+      background: #111115;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    select[size] {
+      background: #111115;
+      border: 1px solid var(--border);
+      color: var(--text);
+      border-radius: 6px;
+      outline: none;
+    }
+    select[size] option {
+      padding: 6px 10px;
+      cursor: pointer;
+      border-bottom: 1px solid #181820;
+    }
+    select[size] option:checked {
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .row { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .col { display: flex; flex-direction: column; gap: 0.35rem; flex: 1; }
+
+    button {
+      padding: 0.55rem 1rem;
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.15s, transform 0.05s;
+      font-size: 0.85rem;
+    }
+    button:hover { background: var(--accent-hover); }
+    button:active { transform: scale(0.98); }
+    button.success { background: var(--success); }
+    button.danger { background: var(--danger); }
+    button.danger:hover { background: var(--danger-hover); }
+    button.secondary { background: #262633; }
+    button.secondary:hover { background: #353545; }
+    button:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* Filter Chips */
+    .chip-bar {
+      display: flex;
+      gap: 0.4rem;
+      overflow-x: auto;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.25rem;
+    }
+    .chip {
+      padding: 0.3rem 0.75rem;
+      background: #20202a;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .chip.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+    }
+
+    /* GALLERY TOOLBAR & CONTROLS */
+    .gallery-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 0.75rem;
+      background: #111116;
+      padding: 0.75rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      margin: 0.75rem 0;
+      background: #111116;
+      padding: 0.6rem 0.85rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .page-btn-group {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+
+    .page-num-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 0.35rem;
+      background: #1e1e2a;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .page-num-btn:hover {
+      background: #2a2a3c;
+      border-color: var(--accent);
+    }
+    .page-num-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+    .page-ellipsis {
+      color: var(--text-muted);
+      padding: 0 0.2rem;
+      font-size: 0.85rem;
+      font-weight: bold;
+    }
+
+    /* RESPONSIVE GALLERY GRID (140px DEFAULT) */
+    .big-gallery-grid {
+      display: grid;
+      gap: 0.85rem;
+      min-height: 380px;
+      max-height: 620px;
+      overflow-y: auto;
+      background: #09090d;
+      padding: 1rem;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      scroll-behavior: smooth;
+    }
+
+    /* Size Class: Standard (140px - DEFAULT) */
+    .big-gallery-grid.size-140 {
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    }
+    .big-gallery-grid.size-140 .big-card .img-box {
+      width: 115px;
+      height: 115px;
+    }
+
+    /* Size Class: Large (180px) */
+    .big-gallery-grid.size-180 {
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+    .big-gallery-grid.size-180 .big-card .img-box {
+      width: 150px;
+      height: 150px;
+    }
+
+    /* Size Class: Jumbo (240px - Huge) */
+    .big-gallery-grid.size-240 {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+    .big-gallery-grid.size-240 .big-card .img-box {
+      width: 210px;
+      height: 210px;
+    }
+
+    .big-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.5rem 0.6rem 0.5rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+      position: relative;
+    }
+    .big-card:hover {
+      border-color: var(--accent);
+      background: var(--card-hover);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(99, 102, 241, 0.22);
+    }
+
+    /* Clock Bezel */
+    .big-card .img-box {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000000;
+      border: 2px solid #22222e;
+      border-radius: 8px;
+      padding: 6px;
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+    }
+    .big-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      image-rendering: pixelated;
+    }
+
+    .big-card .card-meta {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 0.5rem;
+      gap: 2px;
+    }
+    .big-card .card-title {
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--text);
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      width: 100%;
+    }
+    .big-card .card-id {
+      font-size: 0.68rem;
+      color: var(--accent);
+      font-family: monospace;
+      font-weight: 600;
+    }
+
+    .big-card .card-actions {
+      display: flex;
+      gap: 0.3rem;
+      margin-top: 0.45rem;
+      width: 100%;
+    }
+    .big-card .card-actions button {
+      flex: 1;
+      padding: 0.3rem 0.2rem;
+      font-size: 0.68rem;
+    }
+
+    /* PLAYLIST STYLES */
+    .playlist-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0;
+      background: #111116;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .playlist-table th, .playlist-table td {
+      padding: 0.6rem 0.75rem;
+      text-align: left;
+      font-size: 0.82rem;
+      border-bottom: 1px solid #1a1a24;
+    }
+    .playlist-table th {
+      background: #161622;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+    .playlist-table tr.active-row {
+      background: rgba(99, 102, 241, 0.15);
+      border-left: 3px solid var(--accent);
+    }
+    .playlist-table img {
+      width: 32px;
+      height: 32px;
+      image-rendering: pixelated;
+      vertical-align: middle;
+      border-radius: 4px;
+      background: #000;
+    }
+
+    /* Small Library Grid (gifs.js) */
+    .library-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 0.5rem;
+      max-height: 220px;
+      overflow-y: auto;
+      background: #111115;
+      padding: 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      margin-bottom: 1rem;
+    }
+    .lib-btn {
+      padding: 0.55rem 0.4rem;
+      background: #1c1c26;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      color: var(--text);
+      cursor: pointer;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .lib-btn:hover {
+      border-color: var(--accent);
+      background: #252535;
+    }
+
+    /* Canvas */
+    .canvas-container {
+      display: flex;
+      justify-content: center;
+      background: #111114;
+      border-radius: 8px;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      touch-action: none;
+    }
+    canvas {
+      image-rendering: pixelated;
+      cursor: crosshair;
+      border: 2px solid var(--border);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    }
+
+    .palette-grid { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-bottom: 0.75rem; }
+    .color-swatch {
+      width: 32px; height: 32px;
+      border-radius: 6px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 0.1s;
+    }
+    .color-swatch:hover { transform: scale(1.15); }
+
+    .dropzone {
+      border: 2px dashed var(--border);
+      border-radius: 8px;
+      padding: 0.85rem;
+      text-align: center;
+      cursor: pointer;
+      background: #111115;
+      transition: border-color 0.2s;
+    }
+    .dropzone:hover { border-color: var(--accent); }
+
+    .resizer-banner {
+      background: #121218;
+      border: 1px solid #333342;
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    #status {
+      font-size: 0.8rem;
+      font-family: monospace;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      background: #08080b;
+      color: #10b981;
+    }
+    .error { color: #ef4444 !important; }
+    .badge {
+      float: right;
+      font-weight: normal;
+      color: var(--accent);
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <h1>WLED Matrix Studio</h1>
+
+  <!-- Device Setup -->
+  <div class="card">
+    <h2>1. Device Setup</h2>
+    <div class="grid-settings">
+      <div>
+        <label>WLED IP</label>
+        <input type="text" id="ip" value="192.168.1.100" onchange="connectWLED()">
+      </div>
+      <div>
+        <label>Width</label>
+        <input type="number" id="matrixWidth" value="20" min="1" max="64" onchange="initGrid()">
+      </div>
+      <div>
+        <label>Height</label>
+        <input type="number" id="matrixHeight" value="20" min="1" max="64" onchange="initGrid()">
+      </div>
+      <div>
+        <label>Wiring Layout</label>
+        <select id="serpentine" onchange="initGrid()">
+          <option value="true">Serpentine (Zig-Zag)</option>
+          <option value="false">Non-Serpentine</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="top-controls">
+      <div class="row">
+        <button onclick="connectWLED()">Reconnect</button>
+        <button id="pwrBtn" class="success" onclick="toggleMasterPower()">💡 Power: ON</button>
+      </div>
+      <span id="status">Disconnected</span>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-bar">
+    <button class="tab-btn active" onclick="switchTab('effects')">✨ Effects & Colors</button>
+    <button class="tab-btn" onclick="switchTab('explorer')">🖼️ Big Explorer</button>
+    <button class="tab-btn" onclick="switchTab('playlist')">📑 GIF Playlist</button>
+    <button class="tab-btn" onclick="switchTab('lametric_live')">🌐 LaMetric Store</button>
+    <button class="tab-btn" onclick="switchTab('quick')">🎬 Quick Studio</button>
+    <button class="tab-btn" onclick="switchTab('paint')">🎨 Pixel Paint</button>
+  </div>
+
+  <!-- TAB 1: DYNAMIC EFFECTS & CONTROLS -->
+  <div id="tab-effects" class="tab-content active card">
+    <h2>Master Brightness & Solid Colors</h2>
+    <div style="margin-bottom: 0.85rem;">
+      <label>Master Device Brightness <span class="badge" id="briVal">128</span></label>
+      <input type="range" id="bri" min="0" max="255" value="128" oninput="updateSettingLive('bri', this.value)">
+    </div>
+    <div class="palette-grid" id="quickColors"></div>
+
+    <h2>WLED Generative Effects (Dynamic Controls)</h2>
+    <div style="margin-bottom: 0.75rem;">
+      <input type="text" id="effectSearch" placeholder="🔍 Search effects (e.g. Fire 2D, Matrix, Game of Life)..." oninput="filterEffects()">
+    </div>
+
+    <div class="grid-settings">
+      <div style="grid-column: span 2;">
+        <label>Select Effect</label>
+        <select id="effectSelect" size="7" style="height: 160px;" onchange="applyEffectInstant()"></select>
+      </div>
+      <div style="grid-column: span 2;">
+        <label>Color Palette</label>
+        <select id="paletteSelect" size="7" style="height: 160px;" onchange="applyEffectInstant()"></select>
+      </div>
+    </div>
+
+    <!-- DYNAMIC SLIDERS -->
+    <div id="dynamicSlidersContainer" class="col" style="gap: 0.75rem; margin: 1rem 0;"></div>
+
+    <div class="row">
+      <button class="danger" onclick="setSolidBlack()">⬛ Turn Black (Off)</button>
+    </div>
+  </div>
+
+  <!-- TAB 2: BIG GIF EXPLORER (140px DEFAULT) -->
+  <div id="tab-explorer" class="tab-content card">
+    <h2>2,000+ GIF Local Explorer</h2>
+
+    <div class="gallery-toolbar">
+      <div class="row">
+        <button class="success" onclick="openFolderPicker()">📂 Choose GIF Folder</button>
+        <button id="reconnectFolderBtn" class="secondary" style="display:none;" onclick="reconnectSavedFolder()">🔄 Reconnect Folder</button>
+        <input type="file" id="fallbackFolderInput" webkitdirectory directory multiple style="display:none;" onchange="handleFallbackFolder(this.files)">
+      </div>
+
+      <div class="row">
+        <!-- Display Size Selector (140px DEFAULT) -->
+        <label style="font-size:0.75rem; margin:0;">Card Size:</label>
+        <select id="explorerCardSizeSelect" style="width: 170px; padding: 0.35rem;" onchange="updateGlobalCardSize(this.value)">
+          <option value="size-140" selected>Standard (140px - Default)</option>
+          <option value="size-180">Large (180px)</option>
+          <option value="size-240">Jumbo (240px - Huge!)</option>
+        </select>
+
+        <label style="font-size:0.75rem; margin:0; margin-left:0.5rem;">Per Page:</label>
+        <select id="pageSizeSelect" style="width: 110px; padding: 0.35rem;" onchange="updatePageSize(this.value)">
+          <option value="20">20 / page</option>
+          <option value="25" selected>25 / page</option>
+          <option value="50">50 / page</option>
+          <option value="100">100 / page</option>
+          <option value="150">150 / page</option>
+          <option value="200">200 / page</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="margin-bottom: 0.75rem;">
+      <input type="text" id="explorerSearch" placeholder="🔍 Search across all local GIFs (e.g. Mario, Pokemon, Fire)..." oninput="filterExplorer(this.value)">
+    </div>
+
+    <!-- TOP PAGINATION BAR -->
+    <div class="pagination-bar" id="topPaginationBar">
+      <div class="page-btn-group">
+        <button class="secondary" id="firstPageBtn" onclick="goToPage(1)">⏮ First</button>
+        <button class="secondary" id="prevPageBtn" onclick="changePage(-1)">◀ Prev</button>
+      </div>
+      <div class="page-btn-group" id="pageNumbersContainer"></div>
+      <div class="page-btn-group">
+        <button class="secondary" id="nextPageBtn" onclick="changePage(1)">Next ▶</button>
+        <button class="secondary" id="lastPageBtn" onclick="goToLastPage()">Last ⏭</button>
+      </div>
+    </div>
+
+    <!-- Big Visual Grid (size-140 DEFAULT) -->
+    <div class="big-gallery-grid size-140" id="bigGalleryContainer">
+      <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 3rem;">
+        Click <b>"📂 Choose GIF Folder"</b> to load your downloaded GIFs.
+      </div>
+    </div>
+
+    <!-- BOTTOM PAGINATION BAR -->
+    <div class="pagination-bar" id="bottomPaginationBar" style="margin-top: 0.75rem;">
+      <div class="page-btn-group">
+        <button class="secondary" id="bottomFirstPageBtn" onclick="goToPage(1)">⏮ First</button>
+        <button class="secondary" id="bottomPrevPageBtn" onclick="changePage(-1)">◀ Prev</button>
+      </div>
+      <div class="page-btn-group" id="bottomPageNumbersContainer"></div>
+      <div class="page-btn-group">
+        <button class="secondary" id="bottomNextPageBtn" onclick="changePage(1)">Next ▶</button>
+        <button class="secondary" id="bottomLastPageBtn" onclick="goToLastPage()">Last ⏭</button>
+      </div>
+    </div>
+
+    <div style="margin-top: 1rem; background: #111116; padding: 0.75rem 1rem; border-radius: 8px; border: 1px solid var(--border);">
+      <div class="row" style="justify-content: space-between;">
+        <span id="explorerPlayingText" style="font-size:0.85rem; font-weight:600;">Active: None</span>
+        <button class="secondary" onclick="openWledFileManager()">📂 View /edit on ESP32</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 3: GIF PLAYLIST ENGINE -->
+  <div id="tab-playlist" class="tab-content card">
+    <h2>Matrix GIF Playlist (Auto-Cycling)</h2>
+
+    <div class="gallery-toolbar">
+      <div class="row">
+        <button id="playlistPlayBtn" class="success" onclick="togglePlaylistPlay()">▶ Start Playlist</button>
+        <button class="secondary" onclick="clearPlaylist()">🗑️ Clear</button>
+        <button class="secondary" onclick="shufflePlaylist()">🔀 Shuffle</button>
+      </div>
+      <div class="row">
+        <label style="font-size:0.8rem; margin:0;">Seconds per GIF:</label>
+        <input type="number" id="playlistTimingInput" value="10" min="2" max="3600" style="width: 75px; padding: 0.35rem;" onchange="updatePlaylistInterval(this.value)">
+        <span id="playlistCountdownBadge" class="badge" style="float:none; padding: 0.35rem 0.6rem; border-radius:4px; background:#111;">Idle</span>
+      </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+      <table class="playlist-table" id="playlistTable">
+        <thead>
+          <tr>
+            <th style="width: 45px;">#</th>
+            <th style="width: 60px;">Icon</th>
+            <th>Name</th>
+            <th style="width: 100px;">Duration</th>
+            <th style="width: 70px;">Action</th>
+          </tr>
+        </thead>
+        <tbody id="playlistTableBody">
+          <tr>
+            <td colspan="5" style="text-align:center; color:var(--text-muted); padding: 2rem;">
+              Playlist is empty. In the <b>Big Explorer</b> or <b>LaMetric Store</b>, click <b>"➕ Playlist"</b> to queue animations.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- TAB 4: LAMETRIC COMMUNITY STORE (140px DEFAULT) -->
+  <div id="tab-lametric_live" class="tab-content card">
+    <h2>LaMetric Community Icons (Direct CloudFront CDN)</h2>
+
+    <div class="gallery-toolbar">
+      <div class="row">
+        <label style="font-size:0.8rem; margin:0;">Category:</label>
+        <select id="onlineCategorySelect" style="width: 140px; padding: 0.35rem;" onchange="filterLocalStore()">
+          <option value="all" selected>All Categories</option>
+          <option value="Gaming">Gaming & Retro</option>
+          <option value="Animals">Animals</option>
+          <option value="Weather">Weather & Nature</option>
+          <option value="Emoji">Emoji & Smilies</option>
+          <option value="Tech">Tech & Crypto</option>
+          <option value="Symbols">Symbols & Icons</option>
+        </select>
+
+        <label style="font-size:0.8rem; margin:0; margin-left:0.35rem;">Size:</label>
+        <select id="storeCardSizeSelect" style="width: 140px; padding: 0.35rem;" onchange="updateGlobalCardSize(this.value)">
+          <option value="size-140" selected>Standard (140px)</option>
+          <option value="size-180">Large (180px)</option>
+          <option value="size-240">Jumbo (240px)</option>
+        </select>
+
+        <label style="font-size:0.8rem; margin:0; margin-left:0.35rem;">Per Page:</label>
+        <select id="onlinePageSizeSelect" style="width: 95px; padding: 0.35rem;" onchange="changeStorePageSize(this.value)">
+          <option value="12">12 / page</option>
+          <option value="24" selected>24 / page</option>
+          <option value="48">48 / page</option>
+          <option value="96">96 / page</option>
+        </select>
+
+        <!-- Tool Buttons -->
+        <button class="secondary" title="Sync more pages directly from LaMetric API" onclick="syncFromWebsiteLive()">🌐 Sync Website</button>
+        <button class="secondary" title="Load your 2,000+ local folder directly into this Store view" onclick="importFolderToStore()">📂 Import Folder</button>
+      </div>
+
+      <div class="row">
+        <input type="text" id="onlineSearchInput" placeholder="🔍 Search or enter any ID (e.g. 4793, Mario)..." style="width: 250px; padding: 0.35rem;" oninput="filterLocalStore()">
+      </div>
+    </div>
+
+    <!-- Store Pagination -->
+    <div class="pagination-bar">
+      <div class="page-btn-group">
+        <button class="secondary" id="storeFirstBtn" onclick="changeStorePage(1)">⏮ First</button>
+        <button class="secondary" id="storePrevBtn" onclick="changeStorePage(currentStorePage - 1)">◀ Prev</button>
+      </div>
+      <span id="storePageInfo" style="font-weight: 600;">Page 1</span>
+      <div class="page-btn-group">
+        <button class="secondary" id="storeNextBtn" onclick="changeStorePage(currentStorePage + 1)">Next ▶</button>
+        <button class="secondary" id="storeLastBtn" onclick="changeStorePage(999999)">Last ⏭</button>
+      </div>
+    </div>
+
+    <!-- Grid (size-140 DEFAULT) -->
+    <div class="big-gallery-grid size-140" id="onlineGalleryContainer"></div>
+  </div>
+
+  <!-- TAB 5: QUICK STUDIO -->
+  <div id="tab-quick" class="tab-content card">
+    <div style="background: #121217; border: 1px solid var(--border); border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem;">
+      <label style="font-weight: 600; font-size: 0.85rem; color: var(--text);">
+        ⚡ Hardware Playback Speed:
+        <span class="badge" id="gifSpeedBadge">1.0x (128)</span>
+      </label>
+      <input type="range" id="gifSpeedSlider" min="15" max="255" value="128" oninput="updateGifSpeed(this.value)">
+    </div>
+
+    <div class="resizer-banner">
+      <div class="row" style="justify-content: space-between; margin-bottom: 0.35rem;">
+        <label style="font-weight: 600; font-size: 0.82rem; color: var(--text);">
+          📐 Automatic Matrix Resizer (Target: <span id="targetResBadge">20×20</span>)
+        </label>
+        <span style="font-size: 0.75rem; color: var(--success);">● Active</span>
+      </div>
+      <div class="row">
+        <label style="font-size:0.75rem; margin:0;">Scaling Mode:</label>
+        <select id="resizerFitMode" style="flex: 1; padding: 0.35rem;">
+          <option value="contain">Fit (Preserve Aspect & Center)</option>
+          <option value="stretch">Stretch (Fill Entire Matrix)</option>
+          <option value="cover">Cover (Zoom & Crop to Fill)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- LAMETRIC ID DOWNLOADER -->
+    <div style="background: #14141c; border: 1px solid var(--accent); border-radius: 8px; padding: 0.85rem; margin-bottom: 1rem;">
+      <label style="font-weight: 600; font-size: 0.85rem; color: var(--text);">
+        🌐 Quick Download by Any LaMetric ID:
+      </label>
+      <div class="row" style="margin-top: 0.5rem;">
+        <input type="text" id="lametricIdInput" placeholder="Enter ID (e.g. 87, 230, 4793, 5588)" style="flex: 1;">
+        <button class="success" onclick="fetchLaMetricIcon()">📥 Download & Play</button>
+      </div>
+    </div>
+
+    <!-- EXTERNAL GIF LIBRARY (From gifs.js) -->
+    <div style="margin-bottom: 1.25rem;">
+      <div class="row" style="justify-content:space-between; margin-bottom: 0.4rem;">
+        <h2>Built-In Presets (gifs.js)</h2>
+        <span id="libCountBadge" style="font-size:0.75rem; color:var(--text-muted);">20 Animations</span>
+      </div>
+      <div class="chip-bar" id="categoryChips"></div>
+      <div class="library-grid" id="libraryContainer"></div>
+    </div>
+
+    <!-- DROP INDIVIDUAL FILE -->
+    <h2>Drop Single File</h2>
+    <div class="dropzone" onclick="document.getElementById('singleGifInput').click()">
+      <p>📁 Click or Drop a <b>.GIF / .PNG</b> (Auto-Resizes to 20×20 & Overwrites /wclumiere.gif)</p>
+      <input type="file" id="singleGifInput" accept="image/gif,image/png" style="display:none;" onchange="handleSingleFile(this.files[0])">
+    </div>
+
+    <div id="quickControls" style="display: none; margin-top: 1.25rem;">
+      <div class="canvas-container" style="margin-bottom: 0.75rem;">
+        <canvas id="quickPreviewCanvas"></canvas>
+      </div>
+      <div class="row" style="justify-content: space-between;">
+        <span id="quickInfo" style="font-size:0.85rem; color:var(--text-muted);">Playing: /wclumiere.gif</span>
+        <button class="secondary" onclick="openWledFileManager()">📂 View /edit Files</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB 6: PIXEL PAINT -->
+  <div id="tab-paint" class="tab-content card">
+    <div class="row" style="margin-bottom: 0.75rem; justify-content: space-between;">
+      <div class="row">
+        <label>Color: <input type="color" id="brushColor" value="#00ffcc" style="vertical-align:middle;"></label>
+        <div class="palette-grid" id="palette" style="margin:0;"></div>
+      </div>
+      <div class="row">
+        <button class="secondary" onclick="setTool('pen')">Pen</button>
+        <button class="secondary" onclick="setTool('eraser')">Eraser</button>
+        <button class="danger" onclick="clearCanvas()">Clear</button>
+      </div>
+    </div>
+    <div class="canvas-container">
+      <canvas id="paintCanvas"></canvas>
+    </div>
+    <div class="row" style="margin-top: 0.75rem;">
+      <button onclick="pushEntireCanvas()">Push Canvas to LEDs</button>
+      <label style="display:flex; align-items:center; gap:0.4rem; margin:0; cursor:pointer;">
+        <input type="checkbox" id="liveSync" checked> Live Paint
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- EXTERNAL LIBRARIES -->
+<script src="gifs.js"></script>
+<script src="lametric_catalog.js"></script>
+
+<script>
+  let width = 20, height = 20;
+  let currentTool = 'pen', isDrawing = false;
+  let paintBuffer = null;
+  let dirtyIndices = new Map();
+  let liveUpdateTimeout = null;
+  let ws = null;
+  let isMasterPowerOn = true;
+
+  let allEffects = [];
+  let allPalettes = [];
+  let fxData = [];
+
+  // BIG EXPLORER STATE
+  let allFolderFiles = [];
+  let filteredFolderFiles = [];
+  let currentPage = 1;
+  let pageSize = 25;
+  let activeBlobUrls = [];
+
+  // PLAYLIST STATE
+  let playlist = [];
+  let isPlaylistRunning = false;
+  let playlistCurrentIndex = 0;
+  let playlistTimer = null;
+  let playlistCountdownTimer = null;
+  let playlistSecondsRemaining = 0;
+
+  // STORE STATE
+  let currentStorePage = 1;
+  let storePageSize = 24;
+  let filteredStoreItems = [];
+
+  // Initial starter catalog
+  const defaultFallbackCatalog = [
+    { id: 3637, title: "Pac-Man Run", category: "Gaming" },
+    { id: 4584, title: "Pac-Man Ghost", category: "Gaming" },
+    { id: 5588, title: "Pikachu Running", category: "Gaming" },
+    { id: 3061, title: "Super Mario Run", category: "Gaming" },
+    { id: 754, title: "Space Invader Classic", category: "Gaming" },
+    { id: 2475, title: "Zelda Shield", category: "Gaming" },
+    { id: 4122, title: "Minecraft Diamond", category: "Gaming" },
+    { id: 512, title: "1-Up Green Mushroom", category: "Gaming" },
+    { id: 511, title: "Super Red Mushroom", category: "Gaming" },
+    { id: 1812, title: "Sonic Running", category: "Gaming" },
+    { id: 2541, title: "Donkey Kong", category: "Gaming" },
+    { id: 3520, title: "GameBoy Color", category: "Gaming" },
+    { id: 4129, title: "Minecraft Sword", category: "Gaming" },
+    { id: 1541, title: "Tetris T-Piece", category: "Gaming" },
+    { id: 3820, title: "PlayStation Logo", category: "Gaming" },
+    { id: 3821, title: "Xbox Logo", category: "Gaming" },
+    { id: 7756, title: "Campfire Flame", category: "Weather" },
+    { id: 1339, title: "Sunny Sun", category: "Weather" },
+    { id: 2284, title: "Sun Behind Cloud", category: "Weather" },
+    { id: 2285, title: "Rain Cloud Droplets", category: "Weather" },
+    { id: 2286, title: "Lightning Thunderstorm", category: "Weather" },
+    { id: 2287, title: "Snowing Flakes", category: "Weather" },
+    { id: 1412, title: "Rainbow Arc", category: "Weather" },
+    { id: 2411, title: "Ocean Wave Rolling", category: "Weather" },
+    { id: 3412, title: "Autumn Maple Leaf", category: "Weather" },
+    { id: 1782, title: "Christmas Tree Lights", category: "Weather" },
+    { id: 87, title: "Smiley Face", category: "Emoji" },
+    { id: 230, title: "Pulsing Red Heart", category: "Emoji" },
+    { id: 4741, title: "Pink Double Heart", category: "Emoji" },
+    { id: 2065, title: "Orange Tabby Cat", category: "Animals" },
+    { id: 2112, title: "Barking Puppy Dog", category: "Animals" },
+    { id: 3125, title: "Panda Bear Munching", category: "Animals" },
+    { id: 4125, title: "Penguin Waddling", category: "Animals" },
+    { id: 1249, title: "Green Success Checkmark", category: "Symbols" },
+    { id: 1250, title: "Red Failure Cross X", category: "Symbols" },
+    { id: 28, title: "Warning Triangle Yellow", category: "Symbols" },
+    { id: 1901, title: "Analog Clock Hands", category: "Symbols" },
+    { id: 1418, title: "Battery Charging Green", category: "Symbols" },
+    { id: 4793, title: "Hot Coffee Steaming Mug", category: "Symbols" },
+    { id: 3122, title: "Beer Mug Cheers", category: "Symbols" },
+    { id: 653, title: "Matrix Green Digital Rain", category: "Tech" },
+    { id: 4688, title: "Knight Rider Scanner", category: "Tech" },
+    { id: 3770, title: "Bitcoin Gold Coin Spinning", category: "Tech" },
+    { id: 3771, title: "Ethereum Crystal Spinning", category: "Tech" },
+    { id: 1215, title: "YouTube Red Play Button", category: "Tech" }
+  ];
+
+  let activeAnimationSession = 0;
+  let gifFrames = [];
+  let isPlaying = false;
+
+  const paintCanvas = document.getElementById('paintCanvas');
+  const paintCtx = paintCanvas.getContext('2d');
+  const previewCanvas = document.getElementById('quickPreviewCanvas');
+  const previewCtx = previewCanvas.getContext('2d');
+  const statusEl = document.getElementById('status');
+
+  const offscreenCanvas = document.createElement('canvas');
+  const offscreenCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true });
+
+  function initGrid() {
+    width = parseInt(document.getElementById('matrixWidth').value) || 20;
+    height = parseInt(document.getElementById('matrixHeight').value) || 20;
+    document.getElementById('targetResBadge').innerText = `${width}×${height}`;
+
+    const displaySize = 360;
+    paintCanvas.width = displaySize;
+    paintCanvas.height = displaySize;
+    previewCanvas.width = displaySize;
+    previewCanvas.height = displaySize;
+
+    paintCtx.imageSmoothingEnabled = false;
+    previewCtx.imageSmoothingEnabled = false;
+
+    offscreenCanvas.width = width;
+    offscreenCanvas.height = height;
+
+    paintBuffer = new Uint8ClampedArray(width * height * 4);
+    for (let i = 3; i < paintBuffer.length; i += 4) paintBuffer[i] = 255;
+    renderPaintCanvas();
+  }
+
+  function renderPaintCanvas() {
+    const imgData = new ImageData(paintBuffer, width, height);
+    offscreenCtx.putImageData(imgData, 0, 0);
+    paintCtx.drawImage(offscreenCanvas, 0, 0, paintCanvas.width, paintCanvas.height);
+  }
+
+  function renderPreviewCanvas(imgData) {
+    offscreenCtx.putImageData(imgData, 0, 0);
+    previewCtx.drawImage(offscreenCanvas, 0, 0, previewCanvas.width, previewCanvas.height);
+  }
+
+  function getLedIndex(x, y) {
+    const isSerpentine = document.getElementById('serpentine').value === "true";
+    return (isSerpentine && y % 2 === 1) ? y * width + (width - 1 - x) : y * width + x;
+  }
+
+  function createDDPPacket(rgbData, numLeds) {
+    const dataLen = numLeds * 3;
+    const packet = new Uint8Array(1 + 10 + dataLen);
+    packet[0] = 0x02;
+    packet[1] = 0x41;
+    packet[2] = 0x00;
+    packet[3] = 0x0B;
+    packet[4] = 0x01;
+    packet[5] = 0x00; packet[6] = 0x00; packet[7] = 0x00; packet[8] = 0x00;
+    packet[9] = (dataLen >> 8) & 0xFF;
+    packet[10] = dataLen & 0xFF;
+    packet.set(rgbData, 11);
+    return packet;
+  }
+
+  async function sendPayload(payload) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify(payload));
+      return;
+    }
+    const ip = document.getElementById('ip').value.trim();
+    try {
+      await fetch(`http://${ip}/json/state`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {}
+  }
+
+  // -------------------------------------------------------------
+  // MASTER POWER & DYNAMIC WLED EFFECTS (SINGLE /json CALL)
+  // -------------------------------------------------------------
+  async function toggleMasterPower() {
+    isMasterPowerOn = !isMasterPowerOn;
+    await sendPayload({ on: isMasterPowerOn });
+    updatePowerUI();
+  }
+
+  function updatePowerUI() {
+    const pwrBtn = document.getElementById('pwrBtn');
+    if (isMasterPowerOn) {
+      pwrBtn.className = "success";
+      pwrBtn.innerText = "💡 Power: ON";
+    } else {
+      pwrBtn.className = "danger";
+      pwrBtn.innerText = "🔌 Power: OFF";
+    }
+  }
+
+  async function connectWLED() {
+    const ip = document.getElementById('ip').value.trim();
+    if (!ip) {
+      setStatus("Please enter WLED IP", true);
+      return;
+    }
+
+    setStatus("Connecting to WLED...", false);
+
+    try {
+      const res = await fetch(`http://${ip}/json`, { signal: AbortSignal.timeout(4000) });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const data = await res.json();
+
+      allEffects = data.effects || [];
+      allPalettes = data.palettes || [];
+      fxData = data.fxdata || [];
+
+      populateEffectsList(allEffects);
+      const palSel = document.getElementById('paletteSelect');
+      palSel.innerHTML = allPalettes.map((name, i) => `<option value="${i}">${i}: ${name}</option>`).join('');
+
+      if (data.state) {
+        isMasterPowerOn = data.state.on !== false;
+        updatePowerUI();
+
+        const currentBri = data.state.bri !== undefined ? data.state.bri : 128;
+        document.getElementById('bri').value = currentBri;
+        document.getElementById('briVal').innerText = currentBri;
+
+        if (data.state.seg && data.state.seg[0]) {
+          const seg = data.state.seg[0];
+          document.getElementById('effectSelect').value = seg.fx || 0;
+          document.getElementById('paletteSelect').value = seg.pal || 0;
+          document.getElementById('gifSpeedSlider').value = seg.sx !== undefined ? seg.sx : 128;
+          updateSpeedBadge(document.getElementById('gifSpeedSlider').value);
+
+          buildDynamicEffectControls(seg.fx || 0, seg);
+        }
+      }
+
+      setStatus(`Connected (${data.info?.name || "WLED"})`, false);
+      initWebSocket(ip);
+
+    } catch (e) {
+      console.warn("WLED /json fetch error:", e);
+      setStatus("Failed to connect. Check IP.", true);
+    }
+  }
+
+  function initWebSocket(ip) {
+    if (ws) {
+      try { ws.close(); } catch(e){}
+    }
+    try {
+      ws = new WebSocket(`ws://${ip}/ws`);
+      ws.binaryType = 'arraybuffer';
+      ws.onopen = () => console.log("WebSocket open");
+      ws.onerror = () => console.log("WebSocket using HTTP fallback");
+    } catch(e){}
+  }
+
+  function populateEffectsList(effects) {
+    const effSel = document.getElementById('effectSelect');
+    effSel.innerHTML = effects.map((name, i) => `<option value="${i}">${i}: ${name}</option>`).join('');
+  }
+
+  function filterEffects() {
+    const query = document.getElementById('effectSearch').value.toLowerCase();
+    const effSel = document.getElementById('effectSelect');
+    effSel.innerHTML = '';
+    allEffects.forEach((name, i) => {
+      if (name.toLowerCase().includes(query)) {
+        const opt = document.createElement('option');
+        opt.value = i;
+        opt.innerText = `${i}: ${name}`;
+        effSel.appendChild(opt);
+      }
+    });
+  }
+
+  function buildDynamicEffectControls(fxId, segState) {
+    const container = document.getElementById('dynamicSlidersContainer');
+    container.innerHTML = '';
+
+    const descriptor = fxData[fxId] || "";
+    let sliderNames = ["Effect Speed", "Effect Intensity", "Custom 1", "Custom 2", "Custom 3"];
+
+    if (descriptor.includes('@')) {
+      const parts = descriptor.split('@')[1].split(';')[0].split(',');
+      for (let i = 0; i < parts.length && i < 5; i++) {
+        sliderNames[i] = parts[i].trim();
+      }
+    }
+
+    const sliderKeys = [
+      { key: 'sx', defaultName: 'Effect Speed', val: segState.sx !== undefined ? segState.sx : 128 },
+      { key: 'ix', defaultName: 'Effect Intensity', val: segState.ix !== undefined ? segState.ix : 128 },
+      { key: 'c1', defaultName: 'Custom 1', val: segState.c1 !== undefined ? segState.c1 : 128 },
+      { key: 'c2', defaultName: 'Custom 2', val: segState.c2 !== undefined ? segState.c2 : 128 },
+      { key: 'c3', defaultName: 'Custom 3', val: segState.c3 !== undefined ? segState.c3 : 16 }
+    ];
+
+    let renderedCount = 0;
+    sliderKeys.forEach((slider, idx) => {
+      const name = sliderNames[idx];
+      if (descriptor && !name) return;
+
+      renderedCount++;
+      const row = document.createElement('div');
+      row.innerHTML = `
+        <label>${name || slider.defaultName} <span class="badge" id="${slider.key}Val">${slider.val}</span></label>
+        <input type="range" id="${slider.key}" min="0" max="255" value="${slider.val}" oninput="updateSettingLive('${slider.key}', this.value)">
+      `;
+      container.appendChild(row);
+    });
+
+    if (renderedCount === 0) {
+      container.innerHTML = `<span style="color:var(--text-muted); font-size:0.8rem;">This effect does not use customizable parameters.</span>`;
+    }
+  }
+
+  async function applyEffectInstant() {
+    stopPreviewPlayback();
+    stopPlaylist();
+
+    const fx = parseInt(document.getElementById('effectSelect').value) || 0;
+    const pal = parseInt(document.getElementById('paletteSelect').value) || 0;
+    const bri = parseInt(document.getElementById('bri').value);
+
+    await sendPayload({
+      on: true,
+      bri: bri,
+      seg: [{ id: 0, frz: false, fx: fx, pal: pal }]
+    });
+
+    const ip = document.getElementById('ip').value.trim();
+    try {
+      const res = await fetch(`http://${ip}/json/state`, { signal: AbortSignal.timeout(2000) });
+      const state = await res.json();
+      if (state.seg && state.seg[0]) {
+        buildDynamicEffectControls(fx, state.seg[0]);
+      }
+    } catch(e) {
+      buildDynamicEffectControls(fx, {});
+    }
+
+    isMasterPowerOn = true;
+    updatePowerUI();
+    const effectName = document.getElementById('effectSelect').selectedOptions[0]?.innerText || fx;
+    setStatus(`Applied: ${effectName}`, false);
+  }
+
+  async function setSolidColor(hex) {
+    stopPreviewPlayback();
+    stopPlaylist();
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+
+    await sendPayload({
+      on: true,
+      seg: [{ id: 0, frz: false, fx: 0, col: [[r, g, b]] }]
+    });
+    isMasterPowerOn = true;
+    updatePowerUI();
+    setStatus(`Solid Color Applied`, false);
+  }
+
+  async function setSolidBlack() {
+    stopPreviewPlayback();
+    stopPlaylist();
+    await sendPayload({
+      on: true,
+      seg: [{ id: 0, frz: false, fx: 0, col: [[0, 0, 0]] }]
+    });
+    setStatus("Cleared to Black", false);
+  }
+
+  let sliderDebounce = null;
+  function updateSettingLive(key, val) {
+    const badge = document.getElementById(key + 'Val');
+    if (badge) badge.innerText = val;
+    clearTimeout(sliderDebounce);
+    sliderDebounce = setTimeout(() => {
+      if (key === 'bri') {
+        sendPayload({ bri: parseInt(val) });
+      } else {
+        sendPayload({ seg: [{ id: 0, [key]: parseInt(val) }] });
+      }
+    }, 40);
+  }
+
+  let speedDebounce = null;
+  function updateGifSpeed(val) {
+    updateSpeedBadge(val);
+    clearTimeout(speedDebounce);
+    speedDebounce = setTimeout(() => {
+      sendPayload({ seg: [{ id: 0, sx: parseInt(val) }] });
+    }, 40);
+  }
+
+  function updateSpeedBadge(val) {
+    const mult = (val / 128).toFixed(1);
+    document.getElementById('gifSpeedBadge').innerText = `${mult}x (${val})`;
+  }
+
+  // -------------------------------------------------------------
+  // PURE-JS GIF89a ENCODER
+  // -------------------------------------------------------------
+  function encodeLZW(minCodeSize, pixels) {
+    const clearCode = 1 << minCodeSize;
+    const eoiCode = clearCode + 1;
+    let codeSize = minCodeSize + 1;
+    let nextCode = clearCode + 2;
+
+    const dict = new Map();
+    function reset() {
+      dict.clear();
+      codeSize = minCodeSize + 1;
+      nextCode = clearCode + 2;
+    }
+
+    const bytes = [];
+    let cur = 0, bits = 0;
+
+    function emit(code) {
+      cur |= (code << bits);
+      bits += codeSize;
+      while (bits >= 8) {
+        bytes.push(cur & 0xFF);
+        cur >>= 8;
+        bits -= 8;
+      }
+    }
+
+    emit(clearCode);
+
+    let prefix = pixels[0];
+    for (let i = 1; i < pixels.length; i++) {
+      const k = pixels[i];
+      const key = (prefix << 8) | k;
+      if (dict.has(key)) {
+        prefix = dict.get(key);
+      } else {
+        emit(prefix);
+        if (nextCode < 4096) {
+          dict.set(key, nextCode++);
+          if (nextCode >= (1 << codeSize) && codeSize < 12) codeSize++;
+        } else {
+          emit(clearCode);
+          reset();
+        }
+        prefix = k;
+      }
+    }
+    emit(prefix);
+    emit(eoiCode);
+
+    if (bits > 0) bytes.push(cur & 0xFF);
+
+    const subblocks = [];
+    for (let i = 0; i < bytes.length; i += 254) {
+      const chunk = bytes.slice(i, i + 254);
+      subblocks.push(chunk.length, ...chunk);
+    }
+    subblocks.push(0);
+    return [minCodeSize, ...subblocks];
+  }
+
+  function createGifBlob(w, h, frameImages, delayMs = 90) {
+    const palette = new Uint8Array(768);
+    const colorMap = new Map();
+    let nextIdx = 1;
+    palette[0] = 0; palette[1] = 0; palette[2] = 0;
+    colorMap.set("0,0,0", 0);
+
+    function getColorIdx(r, g, b, a) {
+      if (a < 128) return 0;
+      const qr = (r >> 3) << 3, qg = (g >> 3) << 3, qb = (b >> 3) << 3;
+      const key = `${qr},${qg},${qb}`;
+      if (colorMap.has(key)) return colorMap.get(key);
+      if (nextIdx < 256) {
+        const idx = nextIdx++;
+        palette[idx * 3] = qr;
+        palette[idx * 3 + 1] = qg;
+        palette[idx * 3 + 2] = qb;
+        colorMap.set(key, idx);
+        return idx;
+      }
+      return 0;
+    }
+
+    const indexedFrames = frameImages.map(img => {
+      const indices = new Uint8Array(w * h);
+      for (let i = 0; i < w * h; i++) {
+        const p = i * 4;
+        indices[i] = getColorIdx(img.data[p], img.data[p + 1], img.data[p + 2], img.data[p + 3]);
+      }
+      return indices;
+    });
+
+    const parts = [];
+    parts.push(new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61]));
+    parts.push(new Uint8Array([w & 0xFF, (w >> 8) & 0xFF, h & 0xFF, (h >> 8) & 0xFF, 0xF7, 0x00, 0x00]));
+    parts.push(palette);
+    parts.push(new Uint8Array([0x21, 0xFF, 0x0B, 0x4E, 0x45, 0x54, 0x53, 0x43, 0x41, 0x50, 0x45, 0x32, 0x2E, 0x30, 0x03, 0x01, 0x00, 0x00, 0x00]));
+
+    const delayHundredths = Math.max(3, Math.round(delayMs / 10));
+
+    for (const pixels of indexedFrames) {
+      parts.push(new Uint8Array([
+        0x21, 0xF9, 0x04,
+        0x08,
+        delayHundredths & 0xFF, (delayHundredths >> 8) & 0xFF,
+        0x00, 0x00
+      ]));
+      parts.push(new Uint8Array([
+        0x2C, 0, 0, 0, 0,
+        w & 0xFF, (w >> 8) & 0xFF,
+        h & 0xFF, (h >> 8) & 0xFF,
+        0x00
+      ]));
+      parts.push(new Uint8Array(encodeLZW(8, pixels)));
+    }
+
+    parts.push(new Uint8Array([0x3B]));
+    return new Blob(parts, { type: 'image/gif' });
+  }
+
+  // -------------------------------------------------------------
+  // AUTOMATIC IN-BROWSER RESIZING ENGINE
+  // -------------------------------------------------------------
+  async function resizeImageOrGifToMatrix(fileOrBlob) {
+    const targetW = width;
+    const targetH = height;
+    const fitMode = document.getElementById('resizerFitMode').value;
+
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = targetW;
+    tempCanvas.height = targetH;
+    const tctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+    tctx.imageSmoothingEnabled = false;
+
+    function calcDrawCoords(srcW, srcH) {
+      let drawX = 0, drawY = 0, drawW = targetW, drawH = targetH;
+      if (fitMode === 'contain') {
+        const scale = Math.min(targetW / srcW, targetH / srcH);
+        drawW = Math.round(srcW * scale);
+        drawH = Math.round(srcH * scale);
+        drawX = Math.round((targetW - drawW) / 2);
+        drawY = Math.round((targetH - drawH) / 2);
+      } else if (fitMode === 'cover') {
+        const scale = Math.max(targetW / srcW, targetH / srcH);
+        drawW = Math.round(srcW * scale);
+        drawH = Math.round(srcH * scale);
+        drawX = Math.round((targetW - drawW) / 2);
+        drawY = Math.round((targetH - drawH) / 2);
+      }
+      return { drawX, drawY, drawW, drawH };
+    }
+
+    if ('ImageDecoder' in window) {
+      try {
+        const buffer = await fileOrBlob.arrayBuffer();
+        const decoder = new ImageDecoder({ data: buffer, type: 'image/gif' });
+        await decoder.tracks.ready;
+
+        const count = decoder.tracks.selectedTrack.frameCount;
+        const resizedFrames = [];
+        let totalDuration = 0;
+
+        for (let i = 0; i < count; i++) {
+          const { image } = await decoder.decode({ frameIndex: i });
+          const srcW = image.displayWidth || image.codedWidth;
+          const srcH = image.displayHeight || image.codedHeight;
+
+          tctx.clearRect(0, 0, targetW, targetH);
+          const { drawX, drawY, drawW, drawH } = calcDrawCoords(srcW, srcH);
+          tctx.drawImage(image, drawX, drawY, drawW, drawH);
+
+          const dur = (image.duration || 100000) / 1000;
+          totalDuration += dur;
+          image.close();
+
+          resizedFrames.push(tctx.getImageData(0, 0, targetW, targetH));
+        }
+
+        const avgDelay = Math.max(30, Math.round(totalDuration / count));
+        return createGifBlob(targetW, targetH, resizedFrames, avgDelay);
+      } catch (err) {}
+    }
+
+    const img = new Image();
+    const objUrl = URL.createObjectURL(fileOrBlob);
+    img.src = objUrl;
+    await img.decode();
+    URL.revokeObjectURL(objUrl);
+
+    tctx.clearRect(0, 0, targetW, targetH);
+    const { drawX, drawY, drawW, drawH } = calcDrawCoords(img.width, img.height);
+    tctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+    const frameData = tctx.getImageData(0, 0, targetW, targetH);
+    return createGifBlob(targetW, targetH, [frameData], 100);
+  }
+
+  // -------------------------------------------------------------
+  // STRICT OVERWRITE TO /wclumiere.gif
+  // -------------------------------------------------------------
+  async function uploadAndApplyGif(blob, label = "GIF") {
+    const ip = document.getElementById('ip').value.trim();
+    setStatus(`Uploading ${label}...`, false);
+    stopPreviewPlayback();
+
+    try {
+      await sendPayload({ seg: [{ id: 0, frz: false, fx: 0, n: "" }] });
+      await new Promise(r => setTimeout(r, 60));
+
+      const formData = new FormData();
+      formData.append("data", blob, "/wclumiere.gif");
+
+      let uploadRes;
+      try {
+        uploadRes = await fetch(`http://${ip}/upload`, { method: "POST", body: formData });
+      } catch (e) {
+        uploadRes = await fetch(`http://${ip}/edit`, { method: "POST", body: formData });
+      }
+
+      if (!uploadRes.ok) throw new Error("Upload status " + uploadRes.status);
+
+      let imageFxIndex = allEffects.findIndex(name => name.toLowerCase() === "image");
+      if (imageFxIndex === -1) imageFxIndex = 53;
+
+      const currentSpeed = parseInt(document.getElementById('gifSpeedSlider').value) || 128;
+
+      await sendPayload({
+        on: true,
+        seg: [{
+          id: 0,
+          frz: false,
+          fx: imageFxIndex,
+          n: "wclumiere.gif",
+          sx: currentSpeed
+        }]
+      });
+
+      isMasterPowerOn = true;
+      updatePowerUI();
+      setStatus(`Playing ${label} (${width}×${height})!`, false);
+      document.getElementById('explorerPlayingText').innerText = `Active: ${label}`;
+
+      renderBlobPreview(blob);
+    } catch (err) {
+      console.error(err);
+      setStatus("Flash write error. Check IP.", true);
+    }
+  }
+
+  async function processResizeAndUpload(rawFileOrBlob, label) {
+    try {
+      setStatus(`Resizing to ${width}×${height}...`, false);
+      const resizedGifBlob = await resizeImageOrGifToMatrix(rawFileOrBlob);
+      await uploadAndApplyGif(resizedGifBlob, label);
+    } catch (err) {
+      console.error("Resizing error:", err);
+      await uploadAndApplyGif(rawFileOrBlob, label);
+    }
+  }
+
+  function openWledFileManager() {
+    const ip = document.getElementById('ip').value.trim();
+    window.open(`http://${ip}/edit`, '_blank');
+  }
+
+  // -------------------------------------------------------------
+  // GIF PLAYLIST ENGINE (TIMED SEQUENTIAL CYCLING)
+  // -------------------------------------------------------------
+  function addToPlaylist(name, fileOrBlob) {
+    const objUrl = URL.createObjectURL(fileOrBlob);
+    playlist.push({
+      name: name,
+      file: fileOrBlob,
+      url: objUrl
+    });
+    renderPlaylistTable();
+    setStatus(`Added "${name}" to Playlist!`, false);
+  }
+
+  function renderPlaylistTable() {
+    const tbody = document.getElementById('playlistTableBody');
+    tbody.innerHTML = '';
+
+    if (playlist.length === 0) {
+      tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--text-muted); padding: 2rem;">
+        Playlist is empty. In the <b>Big Explorer</b> or <b>LaMetric Store</b>, click <b>"➕ Playlist"</b> to queue animations.
+      </td></tr>`;
+      return;
+    }
+
+    const duration = parseInt(document.getElementById('playlistTimingInput').value) || 10;
+
+    playlist.forEach((item, idx) => {
+      const tr = document.createElement('tr');
+      if (isPlaylistRunning && idx === playlistCurrentIndex) {
+        tr.className = 'active-row';
+      }
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><img src="${item.url}" alt="${item.name}"></td>
+        <td><b>${item.name}</b></td>
+        <td>${duration}s</td>
+        <td><button class="danger" style="padding: 0.25rem 0.5rem; font-size:0.75rem;" onclick="removePlaylistItem(${idx})">✕</button></td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function removePlaylistItem(idx) {
+    URL.revokeObjectURL(playlist[idx].url);
+    playlist.splice(idx, 1);
+    if (playlistCurrentIndex >= playlist.length) playlistCurrentIndex = 0;
+    renderPlaylistTable();
+  }
+
+  function clearPlaylist() {
+    stopPlaylist();
+    playlist.forEach(item => URL.revokeObjectURL(item.url));
+    playlist = [];
+    renderPlaylistTable();
+  }
+
+  function shufflePlaylist() {
+    for (let i = playlist.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [playlist[i], playlist[j]] = [playlist[j], playlist[i]];
+    }
+    playlistCurrentIndex = 0;
+    renderPlaylistTable();
+  }
+
+  function updatePlaylistInterval(val) {
+    renderPlaylistTable();
+  }
+
+  function togglePlaylistPlay() {
+    if (isPlaylistRunning) {
+      stopPlaylist();
+    } else {
+      startPlaylist();
+    }
+  }
+
+  function startPlaylist() {
+    if (playlist.length === 0) {
+      alert("Please add at least one GIF to the playlist first!");
+      return;
+    }
+    isPlaylistRunning = true;
+    document.getElementById('playlistPlayBtn').innerText = "⏸ Pause Playlist";
+    document.getElementById('playlistPlayBtn').className = "danger";
+    playlistCurrentIndex = 0;
+    runPlaylistStep();
+  }
+
+  function stopPlaylist() {
+    isPlaylistRunning = false;
+    clearTimeout(playlistTimer);
+    clearInterval(playlistCountdownTimer);
+    document.getElementById('playlistPlayBtn').innerText = "▶ Start Playlist";
+    document.getElementById('playlistPlayBtn').className = "success";
+    document.getElementById('playlistCountdownBadge').innerText = "Idle";
+    renderPlaylistTable();
+  }
+
+  async function runPlaylistStep() {
+    if (!isPlaylistRunning || playlist.length === 0) return;
+
+    const item = playlist[playlistCurrentIndex];
+    renderPlaylistTable();
+
+    await processResizeAndUpload(item.file, item.name);
+
+    const seconds = parseInt(document.getElementById('playlistTimingInput').value) || 10;
+    playlistSecondsRemaining = seconds;
+
+    clearInterval(playlistCountdownTimer);
+    playlistCountdownTimer = setInterval(() => {
+      playlistSecondsRemaining--;
+      if (playlistSecondsRemaining >= 0) {
+        document.getElementById('playlistCountdownBadge').innerText = `Next in: ${playlistSecondsRemaining}s`;
+      }
+    }, 1000);
+
+    clearTimeout(playlistTimer);
+    playlistTimer = setTimeout(() => {
+      playlistCurrentIndex = (playlistCurrentIndex + 1) % playlist.length;
+      runPlaylistStep();
+    }, seconds * 1000);
+  }
+
+  // -------------------------------------------------------------
+  // GLOBAL CARD SIZE CONTROLLER (SYNCS 140px/180px/240px ACROSS APP)
+  // -------------------------------------------------------------
+  function updateGlobalCardSize(sizeClass) {
+    document.querySelectorAll('.big-gallery-grid').forEach(grid => {
+      grid.classList.remove('size-140', 'size-180', 'size-240');
+      grid.classList.add(sizeClass);
+    });
+    const expSelect = document.getElementById('explorerCardSizeSelect');
+    const storeSelect = document.getElementById('storeCardSizeSelect');
+    if (expSelect) expSelect.value = sizeClass;
+    if (storeSelect) storeSelect.value = sizeClass;
+  }
+
+  // -------------------------------------------------------------
+  // LAMETRIC STORE ENGINE (SYNCS 2,000+ CATALOG & LOCAL FOLDER)
+  // -------------------------------------------------------------
+  function getMasterCatalog() {
+    return (window.LAMETRIC_STORE_CATALOG && window.LAMETRIC_STORE_CATALOG.length > 0)
+      ? window.LAMETRIC_STORE_CATALOG
+      : defaultFallbackCatalog;
+  }
+
+  function filterLocalStore() {
+    const cat = document.getElementById('onlineCategorySelect').value;
+    const q = document.getElementById('onlineSearchInput').value.trim().toLowerCase();
+    const sourceCatalog = getMasterCatalog();
+
+    // Direct ID search support: adds live preview card on the fly if not in catalog
+    if (q && /^\d+$/.test(q)) {
+      const numId = parseInt(q);
+      if (!sourceCatalog.some(item => item.id === numId)) {
+        sourceCatalog.unshift({ id: numId, title: `Custom Icon #${numId}`, category: "Other" });
+      }
+    }
+
+    filteredStoreItems = sourceCatalog.filter(item => {
+      const matchCat = (cat === 'all' || item.category === cat);
+      const titleStr = (item.title || "").toLowerCase();
+      const matchQuery = (!q || titleStr.includes(q) || item.id.toString() === q);
+      return matchCat && matchQuery;
+    });
+
+    currentStorePage = 1;
+    renderStoreGrid();
+  }
+
+  function changeStorePageSize(val) {
+    storePageSize = parseInt(val) || 24;
+    currentStorePage = 1;
+    renderStoreGrid();
+  }
+
+  function changeStorePage(target) {
+    const totalPages = Math.ceil(filteredStoreItems.length / storePageSize) || 1;
+    if (target < 1) target = 1;
+    if (target > totalPages) target = totalPages;
+    currentStorePage = target;
+    renderStoreGrid();
+  }
+
+  function renderStoreGrid() {
+    const container = document.getElementById('onlineGalleryContainer');
+    container.scrollTop = 0;
+    container.innerHTML = '';
+
+    const total = filteredStoreItems.length;
+    const totalPages = Math.ceil(total / storePageSize) || 1;
+
+    document.getElementById('storePrevBtn').disabled = (currentStorePage <= 1);
+    document.getElementById('storeNextBtn').disabled = (currentStorePage >= totalPages);
+    document.getElementById('storeFirstBtn').disabled = (currentStorePage <= 1);
+    document.getElementById('storeLastBtn').disabled = (currentStorePage >= totalPages);
+    document.getElementById('storePageInfo').innerText = `Page ${currentStorePage} of ${totalPages} (${total} Icons)`;
+
+    if (total === 0) {
+      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 3rem;">No icons match your filter.</div>`;
+      return;
+    }
+
+    const startIdx = (currentStorePage - 1) * storePageSize;
+    const pageItems = filteredStoreItems.slice(startIdx, startIdx + storePageSize);
+
+    pageItems.forEach(item => {
+      const card = document.createElement('div');
+      card.className = 'big-card';
+
+      const imgUrl = `https://images.weserv.nl/?url=developer.lametric.com/content/apps/icon_thumbs/${item.id}.gif&n=-1`;
+
+      card.innerHTML = `
+        <div class="img-box">
+          <img src="${imgUrl}" alt="${item.title}" loading="lazy">
+        </div>
+        <div class="card-meta">
+          <span class="card-title" title="${item.title}">${item.title}</span>
+          <span class="card-id">#${item.id}</span>
+        </div>
+        <div class="card-actions">
+          <button class="success" onclick="event.stopPropagation(); downloadAndPlayOnlineIcon('${item.id}', '${item.title}')">▶ Play</button>
+          <button class="secondary" onclick="event.stopPropagation(); downloadAndQueueOnlineIcon('${item.id}', '${item.title}')">➕ Playlist</button>
+          <button class="secondary" onclick="event.stopPropagation(); downloadOnlineIconToFolder('${item.id}', '${item.title}')">💾 Save</button>
+        </div>
+      `;
+
+      card.onclick = () => downloadAndPlayOnlineIcon(item.id, item.title);
+      container.appendChild(card);
+    });
+  }
+
+  // IMPORT YOUR LOCAL DOWNLOADED 2,000+ FOLDER INTO STORE VIEW
+  async function importFolderToStore() {
+    if (allFolderFiles.length === 0) {
+      alert("Please open your 'LaMetric_GIFs' folder first under the 'Big Explorer' tab!");
+      switchTab('explorer');
+      return;
+    }
+
+    setStatus(`Importing ${allFolderFiles.length} local files into Store catalog...`, false);
+    const catalog = getMasterCatalog();
+
+    allFolderFiles.forEach(file => {
+      const baseName = file.name.replace(/\.(gif|png)$/i, '');
+      const match = baseName.match(/^(.*?)[-_](\d+)$/);
+      if (match) {
+        const id = parseInt(match[2]);
+        const title = match[1].replace(/_/g, ' ');
+        if (!catalog.some(i => i.id === id)) {
+          catalog.push({ id: id, title: title, category: "Gaming" });
+        }
+      }
+    });
+
+    window.LAMETRIC_STORE_CATALOG = catalog;
+    filterLocalStore();
+    setStatus(`Imported ${catalog.length} icons into Store!`, false);
+  }
+
+  // SYNC FROM WEBSITE LIVE API
+  async function syncFromWebsiteLive() {
+    setStatus("Connecting to LaMetric API...", false);
+    const targetUrl = `https://developer.lametric.com/api/v2/icons?page_size=200&order=popular&fields=id,title,category`;
+    const proxy = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+    try {
+      const res = await fetch(proxy, { signal: AbortSignal.timeout(5000) });
+      const json = await res.json();
+      if (json && json.contents) {
+        const parsed = JSON.parse(json.contents);
+        if (parsed && parsed.data) {
+          const catalog = getMasterCatalog();
+          parsed.data.forEach(item => {
+            if (!catalog.some(i => i.id === item.id)) {
+              catalog.push({ id: item.id, title: item.title, category: item.category || "Other" });
+            }
+          });
+          window.LAMETRIC_STORE_CATALOG = catalog;
+          filterLocalStore();
+          setStatus(`Successfully synced ${catalog.length} icons!`, false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.warn("Direct proxy failed", e);
+    }
+    setStatus("Sync proxy busy. Use 'Import Folder' to load your 2,000+ files locally!", true);
+  }
+
+  async function fetchIconBlobById(id) {
+    const url = `https://images.weserv.nl/?url=developer.lametric.com/content/apps/icon_thumbs/${id}.gif&n=-1`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(4000) });
+    return await res.blob();
+  }
+
+  async function downloadAndPlayOnlineIcon(id, title) {
+    setStatus(`Fetching "${title}"...`, false);
+    try {
+      const blob = await fetchIconBlobById(id);
+      await processResizeAndUpload(blob, title);
+    } catch (e) {
+      setStatus(`Failed to download icon #${id}.`, true);
+    }
+  }
+
+  async function downloadAndQueueOnlineIcon(id, title) {
+    try {
+      const blob = await fetchIconBlobById(id);
+      addToPlaylist(title, blob);
+    } catch (e) {
+      alert("Failed to fetch icon for playlist");
+    }
+  }
+
+  async function downloadOnlineIconToFolder(id, title) {
+    const safeTitle = title.replace(/[\\/:*?"<>|]/g, '_');
+    const filename = `${safeTitle}-${id}.gif`;
+
+    const exists = allFolderFiles.some(f => 
+      f.name.toLowerCase() === filename.toLowerCase() || 
+      f.name.toLowerCase().endsWith(`-${id}.gif`) || 
+      f.name.toLowerCase().endsWith(`_${id}.gif`)
+    );
+
+    if (exists) {
+      alert(`⚠️ "${filename}" already exists in your local folder!`);
+      return;
+    }
+
+    setStatus(`Downloading ${filename}...`, false);
+
+    try {
+      const blob = await fetchIconBlobById(id);
+
+      const handle = await getSavedDirectoryHandle();
+      if (handle) {
+        try {
+          const perm = await handle.queryPermission({ mode: 'readwrite' });
+          const granted = perm === 'granted' || (await handle.requestPermission({ mode: 'readwrite' })) === 'granted';
+
+          if (granted) {
+            const fileHandle = await handle.getFileHandle(filename, { create: true });
+            const writable = await fileHandle.createWritable();
+            await writable.write(blob);
+            await writable.close();
+
+            const newFile = await fileHandle.getFile();
+            allFolderFiles.push(newFile);
+            allFolderFiles.sort((a, b) => a.name.localeCompare(b.name));
+            filteredFolderFiles = allFolderFiles.slice();
+            renderBigGallery();
+
+            alert(`✅ Saved "${filename}" directly into "${handle.name}"!`);
+            setStatus(`Saved ${filename} to folder.`, false);
+            return;
+          }
+        } catch(e) {}
+      }
+
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      setStatus(`Downloaded ${filename} via browser.`, false);
+
+    } catch (err) {
+      console.error(err);
+      setStatus(`Failed to download ${filename}.`, true);
+    }
+  }
+
+  // -------------------------------------------------------------
+  // BIG EXPLORER: FORUM PAGINATION & SCROLL RESET
+  // -------------------------------------------------------------
+  const DB_NAME = "WLED_Studio_DB";
+  const STORE_NAME = "handles";
+
+  function getDB() {
+    return new Promise((resolve, reject) => {
+      const req = indexedDB.open(DB_NAME, 1);
+      req.onupgradeneeded = () => req.result.createObjectStore(STORE_NAME);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  }
+
+  async function saveDirectoryHandle(handle) {
+    try {
+      const db = await getDB();
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).put(handle, "gifFolder");
+      localStorage.setItem("wled_folder_name", handle.name);
+      checkSavedFolderUI();
+    } catch (e) {}
+  }
+
+  async function getSavedDirectoryHandle() {
+    try {
+      const db = await getDB();
+      const tx = db.transaction(STORE_NAME, "readonly");
+      return new Promise((resolve) => {
+        const req = tx.objectStore(STORE_NAME).get("gifFolder");
+        req.onsuccess = () => resolve(req.result || null);
+        req.onerror = () => resolve(null);
+      });
+    } catch (e) { return null; }
+  }
+
+  async function checkSavedFolderUI() {
+    const folderName = localStorage.getItem("wled_folder_name");
+    const reconnectBtn = document.getElementById('reconnectFolderBtn');
+    if (folderName) {
+      reconnectBtn.style.display = 'inline-block';
+      reconnectBtn.innerText = `🔄 Reconnect "${folderName}"`;
+    }
+  }
+
+  async function reconnectSavedFolder() {
+    const handle = await getSavedDirectoryHandle();
+    if (!handle) return;
+    try {
+      const perm = await handle.requestPermission({ mode: 'read' });
+      if (perm === 'granted') {
+        setStatus(`Reading "${handle.name}"...`, false);
+        allFolderFiles = [];
+        for await (const entry of handle.values()) {
+          if (entry.kind === 'file' && (entry.name.toLowerCase().endsWith('.gif') || entry.name.toLowerCase().endsWith('.png'))) {
+            const file = await entry.getFile();
+            allFolderFiles.push(file);
+          }
+        }
+        allFolderFiles.sort((a, b) => a.name.localeCompare(b.name));
+        filteredFolderFiles = allFolderFiles.slice();
+        currentPage = 1;
+        renderBigGallery();
+        setStatus(`Loaded ${allFolderFiles.length} GIFs from "${handle.name}"!`, false);
+      }
+    } catch (e) {
+      document.getElementById('fallbackFolderInput').click();
+    }
+  }
+
+  async function openFolderPicker() {
+    if ('showDirectoryPicker' in window) {
+      try {
+        const handle = await window.showDirectoryPicker();
+        await saveDirectoryHandle(handle);
+
+        setStatus(`Reading "${handle.name}"...`, false);
+        allFolderFiles = [];
+        for await (const entry of handle.values()) {
+          if (entry.kind === 'file' && (entry.name.toLowerCase().endsWith('.gif') || entry.name.toLowerCase().endsWith('.png'))) {
+            const file = await entry.getFile();
+            allFolderFiles.push(file);
+          }
+        }
+        allFolderFiles.sort((a, b) => a.name.localeCompare(b.name));
+        filteredFolderFiles = allFolderFiles.slice();
+        currentPage = 1;
+        renderBigGallery();
+        setStatus(`Loaded ${allFolderFiles.length} GIFs!`, false);
+        return;
+      } catch (e) {
+        if (e.name === 'AbortError') return;
+      }
+    }
+    document.getElementById('fallbackFolderInput').click();
+  }
+
+  function handleFallbackFolder(fileList) {
+    allFolderFiles = [];
+    for (const f of fileList) {
+      if (f.name.toLowerCase().endsWith('.gif') || f.name.toLowerCase().endsWith('.png')) {
+        allFolderFiles.push(f);
+      }
+    }
+    allFolderFiles.sort((a, b) => a.name.localeCompare(b.name));
+    filteredFolderFiles = allFolderFiles.slice();
+    currentPage = 1;
+    renderBigGallery();
+    setStatus(`Loaded ${allFolderFiles.length} GIFs!`, false);
+  }
+
+  function filterExplorer(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) {
+      filteredFolderFiles = allFolderFiles.slice();
+    } else {
+      filteredFolderFiles = allFolderFiles.filter(f => f.name.toLowerCase().includes(q));
+    }
+    currentPage = 1;
+    renderBigGallery();
+  }
+
+  function goToPage(target) {
+    const totalPages = Math.ceil(filteredFolderFiles.length / pageSize) || 1;
+    if (target < 1) target = 1;
+    if (target > totalPages) target = totalPages;
+    if (currentPage === target) return;
+    currentPage = target;
+    renderBigGallery();
+  }
+
+  function goToLastPage() {
+    const totalPages = Math.ceil(filteredFolderFiles.length / pageSize) || 1;
+    goToPage(totalPages);
+  }
+
+  function changePage(delta) {
+    goToPage(currentPage + delta);
+  }
+
+  function updatePageSize(val) {
+    pageSize = parseInt(val) || 25;
+    currentPage = 1;
+    renderBigGallery();
+  }
+
+  function renderPaginationButtons(totalPages) {
+    const topContainer = document.getElementById('pageNumbersContainer');
+    const bottomContainer = document.getElementById('bottomPageNumbersContainer');
+    topContainer.innerHTML = '';
+    bottomContainer.innerHTML = '';
+
+    if (totalPages <= 1) return;
+
+    const pages = [];
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pages.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pages.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pages.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pages.push(1, '...', currentPage - 1, currentPage, currentPage + 1, '...', totalPages);
+      }
+    }
+
+    [topContainer, bottomContainer].forEach(targetEl => {
+      pages.forEach(p => {
+        if (p === '...') {
+          const span = document.createElement('span');
+          span.className = 'page-ellipsis';
+          span.innerText = '…';
+          targetEl.appendChild(span);
+        } else {
+          const btn = document.createElement('button');
+          btn.className = `page-num-btn ${p === currentPage ? 'active' : ''}`;
+          btn.innerText = p;
+          btn.onclick = () => goToPage(p);
+          targetEl.appendChild(btn);
+        }
+      });
+    });
+  }
+
+  function renderBigGallery() {
+    const container = document.getElementById('bigGalleryContainer');
+    container.scrollTop = 0;
+
+    activeBlobUrls.forEach(url => URL.revokeObjectURL(url));
+    activeBlobUrls = [];
+    container.innerHTML = '';
+
+    const total = filteredFolderFiles.length;
+    const totalPages = Math.ceil(total / pageSize) || 1;
+
+    const isFirst = (currentPage <= 1);
+    const isLast = (currentPage >= totalPages);
+
+    document.getElementById('firstPageBtn').disabled = isFirst;
+    document.getElementById('prevPageBtn').disabled = isFirst;
+    document.getElementById('nextPageBtn').disabled = isLast;
+    document.getElementById('lastPageBtn').disabled = isLast;
+
+    document.getElementById('bottomFirstPageBtn').disabled = isFirst;
+    document.getElementById('bottomPrevPageBtn').disabled = isFirst;
+    document.getElementById('bottomNextPageBtn').disabled = isLast;
+    document.getElementById('bottomLastPageBtn').disabled = isLast;
+
+    if (total === 0) {
+      document.getElementById('pageNumbersContainer').innerHTML = '<span style="color:#777;">0 items</span>';
+      document.getElementById('bottomPageNumbersContainer').innerHTML = '';
+      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 3rem;">
+        No GIFs found in folder.
+      </div>`;
+      return;
+    }
+
+    renderPaginationButtons(totalPages);
+
+    const startIdx = (currentPage - 1) * pageSize;
+    const endIdx = Math.min(startIdx + pageSize, total);
+    const pageItems = filteredFolderFiles.slice(startIdx, endIdx);
+
+    pageItems.forEach(file => {
+      const card = document.createElement('div');
+      card.className = 'big-card';
+
+      const blobUrl = URL.createObjectURL(file);
+      activeBlobUrls.push(blobUrl);
+
+      const baseName = file.name.replace(/\.(gif|png)$/i, '');
+      const match = baseName.match(/^(.*?)[-_](\d+)$/);
+      let displayTitle = baseName;
+      let iconBadge = "";
+
+      if (match) {
+        displayTitle = match[1].replace(/_/g, ' ');
+        iconBadge = `#${match[2]}`;
+      } else {
+        displayTitle = displayTitle.replace(/_/g, ' ');
+      }
+
+      card.innerHTML = `
+        <div class="img-box">
+          <img src="${blobUrl}" alt="${displayTitle}" loading="lazy">
+        </div>
+        <div class="card-meta">
+          <span class="card-title" title="${file.name}">${displayTitle}</span>
+          ${iconBadge ? `<span class="card-id">${iconBadge}</span>` : ''}
+        </div>
+        <div class="card-actions">
+          <button class="success" onclick="event.stopPropagation(); processResizeAndUpload(allFolderFiles.find(f => f.name === '${file.name}'), '${displayTitle}')">▶ Play</button>
+          <button class="secondary" onclick="event.stopPropagation(); addToPlaylist('${displayTitle}', allFolderFiles.find(f => f.name === '${file.name}'))">➕ Add</button>
+        </div>
+      `;
+
+      card.onclick = () => processResizeAndUpload(file, displayTitle);
+      container.appendChild(card);
+    });
+  }
+
+  // -------------------------------------------------------------
+  // RELIABLE LAMETRIC DOWNLOADER (BY ID)
+  // -------------------------------------------------------------
+  async function fetchLaMetricIcon() {
+    const rawId = document.getElementById('lametricIdInput').value.trim().replace('#', '');
+    if (!rawId) {
+      alert("Please enter an Icon ID (e.g. 87, 230, 4793, 5588)");
+      return;
+    }
+
+    setStatus(`Fetching Icon #${rawId}...`, false);
+
+    const urlsToTry = [
+      `https://images.weserv.nl/?url=developer.lametric.com/content/apps/icon_thumbs/${rawId}.gif&n=-1`,
+      `https://images.weserv.nl/?url=developer.lametric.com/content/apps/icon_thumbs/${rawId}.png&output=gif&n=-1`,
+      `https://images.weserv.nl/?url=developer.lametric.com/content/apps/icon_thumbs/${rawId}&n=-1`
+    ];
+
+    let foundBlob = null;
+
+    for (const url of urlsToTry) {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3500);
+        const res = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+
+        if (res.ok) {
+          const blob = await res.blob();
+          if (blob.size > 30) {
+            foundBlob = blob;
+            break;
+          }
+        }
+      } catch (e) {}
+    }
+
+    if (!foundBlob) {
+      setStatus(`Icon #${rawId} not found. Check the ID.`, true);
+      return;
+    }
+
+    await processResizeAndUpload(foundBlob, `LaMetric #${rawId}`);
+  }
+
+  // -------------------------------------------------------------
+  // LOAD EXTERNAL LIBRARY (From gifs.js)
+  // -------------------------------------------------------------
+  function base64ToBlob(base64, mime = 'image/gif') {
+    const bin = atob(base64);
+    const len = bin.length;
+    const arr = new Uint8Array(len);
+    for (let i = 0; i < len; i++) arr[i] = bin.charCodeAt(i);
+    return new Blob([arr], { type: mime });
+  }
+
+  function initExternalLibrary() {
+    const lib = window.WCLUMIERE_GIF_LIBRARY || [];
+    const container = document.getElementById('libraryContainer');
+    const chipBar = document.getElementById('categoryChips');
+    document.getElementById('libCountBadge').innerText = `${lib.length} Animations`;
+
+    if (lib.length === 0) {
+      container.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); font-size: 0.8rem; padding: 1.5rem;">
+        ⚠️ gifs.js not found. Make sure gifs.js is in the same folder as this HTML file.
+      </div>`;
+      return;
+    }
+
+    const categories = ["All", ...new Set(lib.map(item => item.category || "General"))];
+    chipBar.innerHTML = "";
+    categories.forEach(cat => {
+      const chip = document.createElement('div');
+      chip.className = `chip ${cat === 'All' ? 'active' : ''}`;
+      chip.innerText = cat;
+      chip.onclick = () => {
+        document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        renderLibraryItems(cat);
+      };
+      chipBar.appendChild(chip);
+    });
+
+    renderLibraryItems("All");
+  }
+
+  function renderLibraryItems(selectedCategory) {
+    const lib = window.WCLUMIERE_GIF_LIBRARY || [];
+    const container = document.getElementById('libraryContainer');
+    container.innerHTML = "";
+
+    const filtered = selectedCategory === "All" ? lib : lib.filter(i => (i.category || "General") === selectedCategory);
+
+    filtered.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'lib-btn';
+      btn.innerText = item.name;
+      btn.onclick = () => playLibraryItem(item);
+      container.appendChild(btn);
+    });
+  }
+
+  async function playLibraryItem(item) {
+    if (item.b64) {
+      const blob = base64ToBlob(item.b64);
+      await processResizeAndUpload(blob, item.name);
+      return;
+    }
+
+    if (item.render) {
+      const total = item.frames || 12;
+      const delay = item.delay || 90;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+      const tctx = tempCanvas.getContext('2d');
+      const frameImages = [];
+
+      for (let f = 0; f < total; f++) {
+        tctx.clearRect(0, 0, width, height);
+        item.render(tctx, f, total, width, height);
+        frameImages.push(tctx.getImageData(0, 0, width, height));
+      }
+
+      const blob = createGifBlob(width, height, frameImages, delay);
+      uploadAndApplyGif(blob, item.name);
+    }
+  }
+
+  function handleSingleFile(file) {
+    if (!file) return;
+    processResizeAndUpload(file, file.name);
+  }
+
+  // -------------------------------------------------------------
+  // PREVIEW
+  // -------------------------------------------------------------
+  async function renderBlobPreview(blob) {
+    if (!('ImageDecoder' in window)) return;
+    try {
+      const buffer = await blob.arrayBuffer();
+      const decoder = new ImageDecoder({ data: buffer, type: 'image/gif' });
+      await decoder.tracks.ready;
+
+      const count = decoder.tracks.selectedTrack.frameCount;
+      const tempCanvas = document.createElement('canvas');
+      tempCanvas.width = width;
+      tempCanvas.height = height;
+      const tctx = tempCanvas.getContext('2d', { willReadFrequently: true });
+
+      gifFrames = [];
+      for (let i = 0; i < count; i++) {
+        const { image } = await decoder.decode({ frameIndex: i });
+        tctx.clearRect(0, 0, width, height);
+        tctx.drawImage(image, 0, 0, width, height);
+        const durationMs = (image.duration || 100000) / 1000;
+        image.close();
+        gifFrames.push({
+          imgData: tctx.getImageData(0, 0, width, height),
+          delay: Math.max(durationMs, 40)
+        });
+      }
+
+      document.getElementById('quickControls').style.display = 'block';
+      startPreviewPlayback();
+    } catch (e) {}
+  }
+
+  function startPreviewPlayback() {
+    stopPreviewPlayback();
+    isPlaying = true;
+    const session = activeAnimationSession;
+    runPreviewLoop(session);
+  }
+
+  function stopPreviewPlayback() {
+    activeAnimationSession++;
+    isPlaying = false;
+  }
+
+  async function runPreviewLoop(sessionId) {
+    let idx = 0;
+    while (isPlaying && activeAnimationSession === sessionId && gifFrames.length > 0) {
+      const frame = gifFrames[idx];
+      renderPreviewCanvas(frame.imgData);
+
+      const speedVal = parseInt(document.getElementById('gifSpeedSlider').value) || 128;
+      const speedMultiplier = speedVal / 128;
+      const waitTime = Math.max(15, frame.delay / speedMultiplier);
+
+      await new Promise(r => setTimeout(r, waitTime));
+      idx = (idx + 1) % gifFrames.length;
+    }
+  }
+
+  // -------------------------------------------------------------
+  // PIXEL PAINT
+  // -------------------------------------------------------------
+  function drawPixel(e) {
+    const rect = paintCanvas.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    const x = Math.floor((cx - rect.left) / (paintCanvas.width / width));
+    const y = Math.floor((cy - rect.top) / (paintCanvas.height / height));
+
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      const pIdx = (y * width + x) * 4;
+      const color = currentTool === 'eraser' ? '#000000' : document.getElementById('brushColor').value;
+      const r = parseInt(color.slice(1, 3), 16);
+      const g = parseInt(color.slice(3, 5), 16);
+      const b = parseInt(color.slice(5, 7), 16);
+
+      if (paintBuffer[pIdx] !== r || paintBuffer[pIdx + 1] !== g || paintBuffer[pIdx + 2] !== b) {
+        paintBuffer[pIdx] = r;
+        paintBuffer[pIdx + 1] = g;
+        paintBuffer[pIdx + 2] = b;
+        renderPaintCanvas();
+
+        if (document.getElementById('liveSync').checked) {
+          dirtyIndices.set(getLedIndex(x, y), color.replace('#', ''));
+          if (!liveUpdateTimeout) {
+            liveUpdateTimeout = setTimeout(() => {
+              const arr = [];
+              dirtyIndices.forEach((hex, idx) => arr.push(idx, hex));
+              dirtyIndices.clear();
+              sendPayload({ seg: [{ id: 0, i: arr }] });
+              liveUpdateTimeout = null;
+            }, 40);
+          }
+        }
+      }
+    }
+  }
+
+  async function pushEntireCanvas() {
+    stopPreviewPlayback();
+    stopPlaylist();
+    const rgb = new Uint8Array(width * height * 3);
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const ledIdx = getLedIndex(x, y);
+        const pIdx = (y * width + x) * 4;
+        rgb[ledIdx * 3] = paintBuffer[pIdx];
+        rgb[ledIdx * 3 + 1] = paintBuffer[pIdx + 1];
+        rgb[ledIdx * 3 + 2] = paintBuffer[pIdx + 2];
+      }
+    }
+    const packet = createDDPPacket(rgb, width * height);
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(packet);
+    }
+    setStatus("Canvas pushed!", false);
+  }
+
+  function clearCanvas() {
+    for (let i = 0; i < paintBuffer.length; i += 4) {
+      paintBuffer[i] = 0;
+      paintBuffer[i + 1] = 0;
+      paintBuffer[i + 2] = 0;
+    }
+    renderPaintCanvas();
+    pushEntireCanvas();
+  }
+
+  function setTool(tool) { currentTool = tool; }
+
+  function switchTab(tab) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    event.target.classList.add('active');
+    document.getElementById('tab-' + tab).classList.add('active');
+    if (tab === 'paint') stopPreviewPlayback();
+    if (tab === 'lametric_live' && filteredStoreItems.length === 0) {
+      filterLocalStore();
+    }
+  }
+
+  function setStatus(msg, isErr) {
+    statusEl.innerText = msg;
+    statusEl.className = isErr ? 'error' : '';
+  }
+
+  paintCanvas.addEventListener('mousedown', (e) => { isDrawing = true; drawPixel(e); });
+  window.addEventListener('mouseup', () => { isDrawing = false; });
+  paintCanvas.addEventListener('mousemove', (e) => { if (isDrawing) drawPixel(e); });
+
+  paintCanvas.addEventListener('touchstart', (e) => { isDrawing = true; drawPixel(e); }, { passive: false });
+  window.addEventListener('touchend', () => { isDrawing = false; });
+  paintCanvas.addEventListener('touchmove', (e) => { if (isDrawing) drawPixel(e); }, { passive: false });
+
+  // Quick Colors
+  const quickColors = [
+    "#ff0000", "#ff5500", "#ffea00", "#00ff00", "#00ffcc", 
+    "#0066ff", "#7700ff", "#ff00aa", "#ffffff", "#ffb366"
+  ];
+  const qContainer = document.getElementById('quickColors');
+  quickColors.forEach(col => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch';
+    sw.style.background = col;
+    sw.onclick = () => setSolidColor(col);
+    qContainer.appendChild(sw);
+  });
+
+  const pContainer = document.getElementById('palette');
+  quickColors.forEach(col => {
+    const sw = document.createElement('div');
+    sw.className = 'color-swatch';
+    sw.style.background = col;
+    sw.onclick = () => { document.getElementById('brushColor').value = col; currentTool = 'pen'; };
+    pContainer.appendChild(sw);
+  });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    initGrid();
+    connectWLED();
+    initExternalLibrary();
+    checkSavedFolderUI();
+    filterLocalStore();
+    updateGlobalCardSize('size-140'); // Standard 140px Default
+  });
+</script>
+</body>
+</html>

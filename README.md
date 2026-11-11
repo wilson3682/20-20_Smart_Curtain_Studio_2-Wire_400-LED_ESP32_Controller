@@ -13,7 +13,7 @@ Unlike standard 3-wire addressable LEDs, these 2-wire fairy curtains send both p
 
 You can flash this firmware directly to your ESP32 from **Google Chrome** or **Microsoft Edge** using our Web Installer:
 
-1. 👉 **[Click Here to Launch Web Serial Installer](https://wilson3682.github.io/20-20_Smart_Curtain_Studio_2-Wire_400-LED_ESP32_Controller/)**
+1. 👉 **[Click Here to Launch Web Serial Installer](https://wilson3682.github.io/20-20_Smart_Curtain_Studio_2-Wire_400-LED_ESP32_Controller/install.html)**
 2. Plug your **ESP32** into your computer using a data-capable USB cable.
 3. Click **⚡ Install Curtain Studio Firmware**, select your ESP32's COM/Serial port, and click **Install**.
    *(Tip: If your ESP32 stays on "Connecting...", hold down the **BOOT** button on your ESP32 for 2 seconds while clicking Install).*

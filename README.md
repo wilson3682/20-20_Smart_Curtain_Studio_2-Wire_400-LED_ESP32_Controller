@@ -2,11 +2,11 @@
 
 **Thanks to:** 
 
-**Sp0Q1** https://github.com/Sp0Q1/action-smart-led-curtain-2wire
+**Sp0Q1** https://github.com/Sp0Q1/action-smart-led-curtain-2wire for sharing the 2-wire led protocol.
 
-**WLED** https://github.com/wled/WLED
+**WLED** https://github.com/wled/WLED for the Great Smart Led WebApp controller.
 
-**LaMetric** https://developer.lametric.com/icons
+**LaMetric** https://developer.lametric.com/icons for the Great icons and gifs collection.
 
 A high-performance, zero-flicker **ESP32 firmware and studio web interface** **(WLED Style)** designed to control commercial **20×20 (400-LED) 2-Wire Smart Curtain Lights** over Wi-Fi.
 

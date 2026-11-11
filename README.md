@@ -1,9 +1,12 @@
 # ✨ 20×20 Smart Curtain Studio (2-Wire 400-LED ESP32 Controller)
 
-**Thanks to Sp0Q1**
-https://github.com/Sp0Q1/action-smart-led-curtain-2wire
+**Thanks to:** 
 
-A high-performance, zero-flicker **ESP32 firmware and studio web interface** designed to control commercial **20×20 (400-LED) 2-Wire Smart Curtain Lights** over Wi-Fi.
+**Sp0Q1** https://github.com/Sp0Q1/action-smart-led-curtain-2wire
+
+**WLED** https://github.com/wled/WLED
+
+A high-performance, zero-flicker **ESP32 firmware and studio web interface** **(WLED Style)** designed to control commercial **20×20 (400-LED) 2-Wire Smart Curtain Lights** over Wi-Fi.
 
 **Curtain lights used on this project:**
 https://www.amazon.com/dp/B0DKS8FVS7?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1

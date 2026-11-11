@@ -6,6 +6,8 @@
 
 **WLED** https://github.com/wled/WLED
 
+**LaMetric** https://developer.lametric.com/icons
+
 A high-performance, zero-flicker **ESP32 firmware and studio web interface** **(WLED Style)** designed to control commercial **20×20 (400-LED) 2-Wire Smart Curtain Lights** over Wi-Fi.
 
 **Curtain lights used on this project:**

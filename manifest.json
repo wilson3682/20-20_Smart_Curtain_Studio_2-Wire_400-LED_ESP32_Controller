@@ -1,0 +1,16 @@
+{
+  "name": "20x20 Smart Curtain Studio",
+  "version": "3.9",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        {
+          "path": "firmware.bin",
+          "offset": 0
+        }
+      ]
+    }
+  ]
+}

@@ -18,7 +18,7 @@ You can flash this firmware directly to your ESP32 from **Google Chrome** or **M
 3. Click **⚡ Install Curtain Studio Firmware**, select your ESP32's COM/Serial port, and click **Install**.
    *(Tip: If your ESP32 stays on "Connecting...", hold down the **BOOT** button on your ESP32 for 2 seconds while clicking Install).*
    
-### OTA Update * 📦 **[Download Latest `firmware.bin` (For Wireless OTA Update)](firmware/firmware.bin)**
+**OTA Update** * 📦 **[Download Latest `firmware.bin` (For Wireless OTA Update)](firmware/firmware.bin)**
 
 ---
 

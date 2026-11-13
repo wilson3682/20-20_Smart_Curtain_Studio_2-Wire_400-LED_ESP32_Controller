@@ -44,7 +44,7 @@ Use a true **$3.3\text{V}$ Logic-Level N-Channel MOSFET** such as **`AO3400`** (
 ### Option B: Reusing the Original USB Controller Board (`KR-040-R0`)
 1. Locate the 3-pin SMD MOSFET marked **`S10`** (`AO3400`) on the back of the original USB controller PCB near the `LED-` pad.
 2. Disconnect/cut the trace going from the original controller IC (`R7`) to the MOSFET **Gate** (bottom-left pin of `S10`).
-3. Connect **ESP32 `GPIO 4`** through a **`200 Ω` resistor** to the MOSFET **Gate**.
+3. Connect **ESP32 `GPIO 4`** through a **`220 Ω` resistor** to the MOSFET **Gate**.
 4. Connect **ESP32 `GND`** to the original board's **`GND`** and power both from `+5V`.
 
 ---

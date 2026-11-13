@@ -32,44 +32,14 @@ You can flash this firmware directly to your ESP32 from **Google Chrome** or **M
 
 ## 🔌 Hardware Wiring
 
+
+
 You can wire your ESP32 in **two ways**: either by building a simple standalone MOSFET circuit or by reusing the MOSFET on the curtain's original USB controller board.
 
 ### Option A: Standalone MOSFET Circuit (Recommended)
 Use a true **$3.3\text{V}$ Logic-Level N-Channel MOSFET** such as **`AO3400`** (SMD), **`AO3402`**, **`IRLZ34N`** (TO-220), or **`RFP30N06LE`** (TO-220).
 
-```text
-                  +5V DC Power Supply (1A - 3A)
-                 (+)                         (-)
-                  │                           │
-        ┌─────────┼─────────┬─────────────────┤
-        │         │        (+)                │
-        │         │      470µF - 1000µF       │
-        │         │      Capacitor (C1)       │
-        │         │        (-)                │
-        │         │         └─────────────────┤
-        ▼         ▼                           │
-   [ESP32 VIN]  [Curtain LED+]                │
-   (or 5V Pin)    │                           │
-                  ▼                           │
-            (400 Curtain                      │
-               LEDs)                          │
-                  │                           │
-                [Curtain LED-]                │
-                  │                           │
-                  ▼                           │
-               (DRAIN)                        │
-                ┌───────────┐                 │
-   [GPIO 4]─────┤  GATE     │  N-Channel Logic MOSFET
-    via R7      │           │  (AO3400 / AO3402 / IRLZ34N)
-  (200Ω-220Ω)   │  SOURCE   │                 │
-         │      └─────┬─────┘                 │
-         │            │                       │
-        ┌┴─┐          │                       │
-        │R8│ 100kΩ    │                       │
-        └┬─┘          │                       │
-         │            │                       │
-   [ESP32 GND]────────┴───────────────────────┴──── Common GND
-```
+![MOSFET Output Wiring](OutPut_Mosfet.png)
 
 ### Option B: Reusing the Original USB Controller Board (`KR-040-R0`)
 1. Locate the 3-pin SMD MOSFET marked **`S10`** (`AO3400`) on the back of the original USB controller PCB near the `LED-` pad.
